@@ -27,12 +27,12 @@ export default class ParallaxScrollView extends Component {
   }
 
   scrollTo(where) {
-    if (!this._scrollView) return;
-    this._scrollView.scrollTo(where);
+    if (!scrollViewRef) return;
+    this.scrollViewRef.scrollTo(where);
   }
-  
+
   renderBackground() {
-    var { windowHeight, backgroundSource, onBackgroundLoadEnd, onBackgroundLoadError } = this.props;
+    var { windowHeight, backgroundSource, onBackgroundLoadEnd, onBackgroundLoadError, scrollViewRef} = this.props;
     var { scrollY } = this.state;
     if (!windowHeight || !backgroundSource) {
       return null;
@@ -75,7 +75,7 @@ export default class ParallaxScrollView extends Component {
       return null;
     }
 
-    const newNavBarHeight = navBarHeight || DEFAULT_NAVBAR_HEIGHT;    
+    const newNavBarHeight = navBarHeight || DEFAULT_NAVBAR_HEIGHT;
     const newWindowHeight = windowHeight - newNavBarHeight;
 
     return (
@@ -138,7 +138,7 @@ export default class ParallaxScrollView extends Component {
 
   rendernavBar() {
     const {
-      windowHeight, backgroundSource, leftIcon,
+      windowHeight, backgroundSource, leftIcon, scrollViewRef,
       rightIcon, leftIconOnPress, rightIconOnPress, navBarColor, navBarHeight, leftIconUnderlayColor, rightIconUnderlayColor
     } = this.props;
     const { scrollY } = this.state;
@@ -165,7 +165,7 @@ export default class ParallaxScrollView extends Component {
           >
           {this.props.navBarView}
           </Animated.View>
-        );                
+        );
     }
     else
     {
@@ -178,7 +178,7 @@ export default class ParallaxScrollView extends Component {
               backgroundColor: scrollY.interpolate({
                 inputRange: [-windowHeight, windowHeight * DEFAULT_WINDOW_MULTIPLIER, windowHeight * 0.8],
                 outputRange: ['transparent', 'transparent', navBarColor || 'rgba(0, 0, 0, 1.0)'],
-                extrapolate: 'clamp'
+                extrapolate: 'clamp',
               })
             }}
           >
@@ -210,7 +210,7 @@ export default class ParallaxScrollView extends Component {
             >
               {this.renderNavBarTitle()}
             </View>
-          {rightIcon &&         
+          {rightIcon &&
             <View
               style={{
                 flex: 1,
@@ -229,7 +229,7 @@ export default class ParallaxScrollView extends Component {
             </View>
           }
           </Animated.View>
-        );        
+        );
     }
   }
 
@@ -283,16 +283,14 @@ export default class ParallaxScrollView extends Component {
   }
 
   render() {
-    const { style, ...props } = this.props;
+    const { style, scrollViewRef=this._scrollView, ...props } = this.props;
 
     return (
       <View style={[styles.container, style]}>
         {this.renderBackground()}
         {this.rendernavBar()}
         <ScrollView
-          ref={component => {
-            this._scrollView = component;
-          }}
+          ref={scrollViewRef}
           {...props}
           style={styles.scrollView}
           onScroll={Animated.event([
@@ -314,7 +312,7 @@ ParallaxScrollView.defaultProps = {
   backgroundSource: {uri: 'http://i.imgur.com/6Iej2c3.png'},
   windowHeight: SCREEN_HEIGHT * DEFAULT_WINDOW_MULTIPLIER,
   leftIconOnPress: () => console.log('Left icon pressed'),
-  rightIconOnPress: () => console.log('Right icon pressed')
+  rightIconOnPress: () => console.log('Right icon pressed'),
 };
 
 ParallaxScrollView.propTypes = {
@@ -330,5 +328,6 @@ ParallaxScrollView.propTypes = {
   userTitle: PropTypes.string,
   headerView: PropTypes.node,
   leftIcon: PropTypes.object,
-  rightIcon: PropTypes.object
+  rightIcon: PropTypes.object,
+  scrollViewRef: PropTypes.object
 };
